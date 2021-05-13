@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <title>Chat</title>
+</head>
+<body>
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold">Hello!</h1>
+    <div class="container">
+        <div class="py-5 text-center">
+            <h2>Чат программа</h2>
+            <p class="lead">Укажите ваше имя и начинайте переписку</p>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <!-- Форма для получения сообщений и имени -->
+                <h3>Start messaging!</h3>
+                <form id="messForm">
+                    <h4 class="fw-bold mb-0" id="myname" style="text-align: left; font-size: 16px;">Your name: </h4>
+                    <br>
+                    <label for="message" style="text-align: left; width: 100%">Write your message</label>
+                    <textarea name="message" id="message" class="form-control" placeholder="Write there!"></textarea>
+                    <br>
+                    <input type="submit" value="Отправить" class="btn btn-danger">
+                </form>
+            </div>
+            <div class="col-6">
+                <h3>Сообщения</h3>
+                <!-- Вывод всех сообщений будет здесь -->
+                <div id="all_mess"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
+    $(function () {
+        var socket = io.connect();
+        var $form = $("#messForm");
+        var myname = $("#myname");
+        var $name = prompt("Write your name:", "user"+getRandomInt(10000));
+        myname.text('Your name: ' + $name);
+        var $textarea = $("#message");
+        var $all_messages = $("#all_mess");
+
+        $form.submit(function(event) {
+            event.preventDefault();
+            socket.emit('send mess', {mess: $textarea.val(), name: $name});
+            $textarea.val('');
+    });
+
+    socket.on('add mess', function (data) {
+        $all_messages.append('<div style="text-align: left"><b>' + data.name + '</b>:' + data.mess + '</div>');
+    });
+    })
+</script>
+</body>
+</html>
